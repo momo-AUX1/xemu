@@ -73,6 +73,30 @@
   <string name="library_about_url_license" translatable="false">https://github.com/izzy2lost/xemu/blob/master/LICENSE</string>
   <string name="library_about_url_disclaimer" translatable="false">https://github.com/izzy2lost/xemu/blob/master/COPYING</string>
 
+  <string name="library_settings">Settings</string>
+
+  <string name="settings_title">Settings</string>
+  <string name="settings_save">Save</string>
+
+  <string name="settings_section_display">Display</string>
+  <string name="settings_resolution_scale">Internal Resolution Scale</string>
+  <string name="settings_resolution_scale_1x">1x (Native 480p)</string>
+  <string name="settings_resolution_scale_2x">2x (960p)</string>
+  <string name="settings_resolution_scale_3x">3x (1440p)</string>
+
+  <string name="settings_section_performance">Performance</string>
+  <string name="settings_tcg_thread">CPU Threading Mode</string>
+  <string name="settings_tcg_thread_multi">Multi-thread</string>
+  <string name="settings_tcg_thread_single">Single-thread</string>
+  <string name="settings_hard_fpu">Hardware FPU</string>
+  <string name="settings_cache_shaders">Shader Cache</string>
+
+  <string name="settings_section_audio">Audio</string>
+  <string name="settings_use_dsp">Real-time DSP Processing</string>
+  <string name="settings_hrtf">HRTF (3D Audio)</string>
+
+  <string name="settings_saved">Settings saved</string>
+
   <string name="in_game_menu_title">Game Menu</string>
   <string name="in_game_menu_resume">Resume</string>
   <string name="in_game_menu_restart_game">Restart Game</string>

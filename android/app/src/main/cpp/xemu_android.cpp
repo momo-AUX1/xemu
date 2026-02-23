@@ -329,6 +329,80 @@ cleanup:
   return out;
 }
 
+static bool GetPrefBool(JNIEnv* env, jobject activity, const char* key, bool defValue) {
+  if (!env || !activity || !key || key[0] == '\0') {
+    return defValue;
+  }
+  bool out = defValue;
+  jclass activityClass = env->GetObjectClass(activity);
+  if (!activityClass) return defValue;
+  jmethodID getPrefs = env->GetMethodID(activityClass, "getSharedPreferences",
+                                        "(Ljava/lang/String;I)Landroid/content/SharedPreferences;");
+  env->DeleteLocalRef(activityClass);
+  if (!getPrefs) return defValue;
+  jstring prefsName = env->NewStringUTF(kPrefsName);
+  if (!prefsName) return defValue;
+  jobject prefs = env->CallObjectMethod(activity, getPrefs, prefsName, 0);
+  env->DeleteLocalRef(prefsName);
+  if (HasException(env, "getSharedPreferences") || !prefs) return defValue;
+  jclass prefsClass = env->GetObjectClass(prefs);
+  if (prefsClass) {
+    jmethodID contains = env->GetMethodID(prefsClass, "contains", "(Ljava/lang/String;)Z");
+    jmethodID getBool  = env->GetMethodID(prefsClass, "getBoolean", "(Ljava/lang/String;Z)Z");
+    if (contains && getBool) {
+      jstring jkey = env->NewStringUTF(key);
+      if (jkey) {
+        jboolean hasKey = env->CallBooleanMethod(prefs, contains, jkey);
+        if (!HasException(env, "contains") && hasKey) {
+          out = (bool)env->CallBooleanMethod(prefs, getBool, jkey, (jboolean)defValue);
+          HasException(env, "getBoolean");
+        }
+        env->DeleteLocalRef(jkey);
+      }
+    }
+    env->DeleteLocalRef(prefsClass);
+  }
+  env->DeleteLocalRef(prefs);
+  return out;
+}
+
+static int GetPrefInt(JNIEnv* env, jobject activity, const char* key, int defValue) {
+  if (!env || !activity || !key || key[0] == '\0') {
+    return defValue;
+  }
+  int out = defValue;
+  jclass activityClass = env->GetObjectClass(activity);
+  if (!activityClass) return defValue;
+  jmethodID getPrefs = env->GetMethodID(activityClass, "getSharedPreferences",
+                                        "(Ljava/lang/String;I)Landroid/content/SharedPreferences;");
+  env->DeleteLocalRef(activityClass);
+  if (!getPrefs) return defValue;
+  jstring prefsName = env->NewStringUTF(kPrefsName);
+  if (!prefsName) return defValue;
+  jobject prefs = env->CallObjectMethod(activity, getPrefs, prefsName, 0);
+  env->DeleteLocalRef(prefsName);
+  if (HasException(env, "getSharedPreferences") || !prefs) return defValue;
+  jclass prefsClass = env->GetObjectClass(prefs);
+  if (prefsClass) {
+    jmethodID contains = env->GetMethodID(prefsClass, "contains", "(Ljava/lang/String;)Z");
+    jmethodID getInt   = env->GetMethodID(prefsClass, "getInt", "(Ljava/lang/String;I)I");
+    if (contains && getInt) {
+      jstring jkey = env->NewStringUTF(key);
+      if (jkey) {
+        jboolean hasKey = env->CallBooleanMethod(prefs, contains, jkey);
+        if (!HasException(env, "contains") && hasKey) {
+          out = (int)env->CallIntMethod(prefs, getInt, jkey, (jint)defValue);
+          HasException(env, "getInt");
+        }
+        env->DeleteLocalRef(jkey);
+      }
+    }
+    env->DeleteLocalRef(prefsClass);
+  }
+  env->DeleteLocalRef(prefs);
+  return out;
+}
+
 static bool CopyUriToPath(JNIEnv* env, jobject activity, const std::string& uriString, const std::string& path) {
   if (!env || !activity || uriString.empty() || path.empty()) return false;
 
@@ -488,6 +562,15 @@ cleanup:
   return success;
 }
 
+struct EmulatorSettings {
+  int surface_scale    = 1;         // 1, 2, or 3
+  std::string tcg_thread = "multi"; // "single" or "multi"
+  bool use_dsp         = true;
+  bool hrtf            = true;
+  bool cache_shaders   = true;
+  bool hard_fpu        = true;
+};
+
 struct SetupFiles {
   std::string mcpx;
   std::string flash;
@@ -503,7 +586,8 @@ static bool WriteConfigToml(const std::string& config_path,
                             const std::string& flash,
                             const std::string& hdd,
                             const std::string& dvd,
-                            const std::string& eeprom) {
+                            const std::string& eeprom,
+                            const EmulatorSettings& settings) {
   if (config_path.empty()) return false;
   toml::table tbl;
 
@@ -527,14 +611,16 @@ static bool WriteConfigToml(const std::string& config_path,
 
   toml::table* general = EnsureTable(tbl, "general");
   toml::table* display = EnsureTable(tbl, "display");
+  toml::table* display_quality = EnsureTable(*display, "quality");
   toml::table* display_window = EnsureTable(*display, "window");
   toml::table* audio = EnsureTable(tbl, "audio");
   toml::table* audio_vp = EnsureTable(*audio, "vp");
   toml::table* android = EnsureTable(tbl, "android");
   toml::table* sys = EnsureTable(tbl, "sys");
+  toml::table* perf = EnsureTable(tbl, "perf");
   toml::table* files = EnsureTable(*sys, "files");
-  if (!general || !display || !display_window || !audio || !audio_vp ||
-      !android || !sys || !files) {
+  if (!general || !display || !display_quality || !display_window || !audio ||
+      !audio_vp || !android || !sys || !perf || !files) {
     LogErrorFmt("Failed to build config tables at %s", config_path.c_str());
     return false;
   }
@@ -547,11 +633,21 @@ static bool WriteConfigToml(const std::string& config_path,
   if (!display_window->contains("vsync")) {
     display_window->insert_or_assign("vsync", false);
   }
+  // User-controlled settings (always written so they take effect immediately)
+  {
+    int scale = settings.surface_scale;
+    if (scale < 1) scale = 1;
+    if (scale > 3) scale = 3;
+    display_quality->insert_or_assign("surface_scale", scale);
+  }
+  audio->insert_or_assign("use_dsp", settings.use_dsp);
+  audio->insert_or_assign("hrtf", settings.hrtf);
+  perf->insert_or_assign("cache_shaders", settings.cache_shaders);
+  perf->insert_or_assign("hard_fpu", settings.hard_fpu);
+  android->insert_or_assign("tcg_thread",
+    (settings.tcg_thread == "single") ? "single" : "multi");
   if (!audio_vp->contains("num_workers")) {
     audio_vp->insert_or_assign("num_workers", 0);
-  }
-  if (!audio->contains("hrtf")) {
-    audio->insert_or_assign("hrtf", true);
   }
   if (!audio->contains("volume_limit")) {
     audio->insert_or_assign("volume_limit", 1.0);
@@ -561,9 +657,6 @@ static bool WriteConfigToml(const std::string& config_path,
   }
   if (!android->contains("tcg_tuning")) {
     android->insert_or_assign("tcg_tuning", true);
-  }
-  if (!android->contains("tcg_thread")) {
-    android->insert_or_assign("tcg_thread", "multi");
   }
   if (!android->contains("tcg_tb_size")) {
     android->insert_or_assign("tcg_tb_size", 128);
@@ -681,8 +774,21 @@ static SetupFiles SyncSetupFiles() {
     }
   }
 
+  EmulatorSettings emuSettings;
+  emuSettings.surface_scale  = GetPrefInt(env, activity, "setting_surface_scale", 1);
+  emuSettings.use_dsp        = GetPrefBool(env, activity, "setting_use_dsp", true);
+  emuSettings.hrtf           = GetPrefBool(env, activity, "setting_hrtf", true);
+  emuSettings.cache_shaders  = GetPrefBool(env, activity, "setting_cache_shaders", true);
+  emuSettings.hard_fpu       = GetPrefBool(env, activity, "setting_hard_fpu", true);
+  {
+    std::string tcgThread = GetPrefString(env, activity, "setting_tcg_thread");
+    if (tcgThread == "single") {
+      emuSettings.tcg_thread = "single";
+    }
+  }
+
   out.config_path = base + "/xemu.toml";
-  WriteConfigToml(out.config_path, out.mcpx, out.flash, out.hdd, out.dvd, out.eeprom);
+  WriteConfigToml(out.config_path, out.mcpx, out.flash, out.hdd, out.dvd, out.eeprom, emuSettings);
   LogInfoFmt("SyncSetupFiles: config %s", out.config_path.c_str());
   LogInfoFmt("Resolved mcpx=%s", out.mcpx.c_str());
   LogInfoFmt("Resolved flash=%s", out.flash.c_str());

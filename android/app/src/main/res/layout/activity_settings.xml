@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/setup_wizard_background"
+  android:fitsSystemWindows="true">
+
+  <androidx.core.widget.NestedScrollView
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:padding="24dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center_horizontal"
+      android:orientation="vertical">
+
+      <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/xemu_surface"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="8dp"
+        app:strokeColor="@color/xemu_outline_variant"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="24dp">
+
+          <!-- Title -->
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="@string/settings_title"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium" />
+
+          <!-- ── DISPLAY ── -->
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settings_section_display"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="@color/xemu_green" />
+
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="@string/settings_resolution_scale"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/xemu_text_muted" />
+
+          <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_resolution_scale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_scale_1x"
+              style="?attr/materialButtonOutlinedStyle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/settings_resolution_scale_1x" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_scale_2x"
+              style="?attr/materialButtonOutlinedStyle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/settings_resolution_scale_2x" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_scale_3x"
+              style="?attr/materialButtonOutlinedStyle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/settings_resolution_scale_3x" />
+
+          </com.google.android.material.button.MaterialButtonToggleGroup>
+
+          <!-- ── PERFORMANCE ── -->
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settings_section_performance"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="@color/xemu_green" />
+
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:text="@string/settings_tcg_thread"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/xemu_text_muted" />
+
+          <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/toggle_tcg_thread"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_thread_multi"
+              style="?attr/materialButtonOutlinedStyle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/settings_tcg_thread_multi" />
+
+            <com.google.android.material.button.MaterialButton
+              android:id="@+id/btn_thread_single"
+              style="?attr/materialButtonOutlinedStyle"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="@string/settings_tcg_thread_single" />
+
+          </com.google.android.material.button.MaterialButtonToggleGroup>
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_hard_fpu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/settings_hard_fpu"
+            android:textColor="@color/xemu_text_muted" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_cache_shaders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/settings_cache_shaders"
+            android:textColor="@color/xemu_text_muted" />
+
+          <!-- ── AUDIO ── -->
+          <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/settings_section_audio"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+            android:textColor="@color/xemu_green" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_use_dsp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_use_dsp"
+            android:textColor="@color/xemu_text_muted" />
+
+          <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_hrtf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/settings_hrtf"
+            android:textColor="@color/xemu_text_muted" />
+
+          <!-- Save button -->
+          <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_settings_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/settings_save" />
+
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

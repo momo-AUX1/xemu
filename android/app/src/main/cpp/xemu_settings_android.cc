@@ -229,6 +229,7 @@ bool xemu_settings_load(void)
         // Cache table lookups to avoid repeated traversal
         auto general = tbl["general"];
         auto display = tbl["display"];
+        auto display_quality = display["quality"];
         auto display_window = display["window"];
         auto audio = tbl["audio"];
         auto audio_vp = audio["vp"];
@@ -251,6 +252,13 @@ bool xemu_settings_load(void)
                                     "Config display.renderer=%s requested, but Android forces Vulkan",
                                     renderer->c_str());
             }
+        }
+
+        if (auto surface_scale = display_quality["surface_scale"].value<int64_t>()) {
+            int scale = (int)*surface_scale;
+            if (scale < 1) scale = 1;
+            if (scale > 3) scale = 3;
+            g_config.display.quality.surface_scale = scale;
         }
 
         if (auto filtering = display["filtering"].value<std::string>()) {

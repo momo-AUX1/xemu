@@ -71,6 +71,7 @@ class GameLibraryActivity : AppCompatActivity() {
   private lateinit var gamesListContainer: LinearLayout
   private lateinit var gamesGridContainer: LinearLayout
   private lateinit var btnChangeFolder: MaterialButton
+  private lateinit var btnSettings: MaterialButton
   private lateinit var btnConvertIso: MaterialButton
   private lateinit var btnAbout: ImageButton
   private lateinit var viewModeToggle: MaterialButtonToggleGroup
@@ -110,6 +111,7 @@ class GameLibraryActivity : AppCompatActivity() {
     gamesListContainer = findViewById(R.id.library_games_container)
     gamesGridContainer = findViewById(R.id.library_games_grid_container)
     btnChangeFolder = findViewById(R.id.btn_change_games_folder)
+    btnSettings = findViewById(R.id.btn_settings)
     btnConvertIso = findViewById(R.id.btn_convert_iso)
     btnAbout = findViewById(R.id.btn_library_about)
     viewModeToggle = findViewById(R.id.library_view_mode_toggle)
@@ -129,6 +131,9 @@ class GameLibraryActivity : AppCompatActivity() {
         return@setOnClickListener
       }
       pickGamesFolder.launch(gamesFolderUri)
+    }
+    btnSettings.setOnClickListener {
+      startActivity(Intent(this, SettingsActivity::class.java))
     }
     btnConvertIso.setOnClickListener {
       showIsoConversionPicker()
