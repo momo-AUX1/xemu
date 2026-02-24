@@ -565,7 +565,7 @@ cleanup:
 struct EmulatorSettings {
   int surface_scale    = 1;         // 1, 2, or 3
   std::string tcg_thread = "multi"; // "single" or "multi"
-  bool use_dsp         = true;
+  bool use_dsp         = false;
   bool hrtf            = true;
   bool cache_shaders   = true;
   bool hard_fpu        = true;
@@ -776,7 +776,7 @@ static SetupFiles SyncSetupFiles() {
 
   EmulatorSettings emuSettings;
   emuSettings.surface_scale  = GetPrefInt(env, activity, "setting_surface_scale", 1);
-  emuSettings.use_dsp        = GetPrefBool(env, activity, "setting_use_dsp", true);
+  emuSettings.use_dsp        = GetPrefBool(env, activity, "setting_use_dsp", false);
   emuSettings.hrtf           = GetPrefBool(env, activity, "setting_hrtf", true);
   emuSettings.cache_shaders  = GetPrefBool(env, activity, "setting_cache_shaders", true);
   emuSettings.hard_fpu       = GetPrefBool(env, activity, "setting_hard_fpu", true);

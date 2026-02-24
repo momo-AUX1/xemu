@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
       toggleThread.check(R.id.btn_thread_multi)
     }
 
-    switchDsp.isChecked     = prefs.getBoolean("setting_use_dsp", true)
+    switchDsp.isChecked     = prefs.getBoolean("setting_use_dsp", false)
     switchHrtf.isChecked    = prefs.getBoolean("setting_hrtf", true)
     switchShaders.isChecked = prefs.getBoolean("setting_cache_shaders", true)
     switchFpu.isChecked     = prefs.getBoolean("setting_hard_fpu", true)

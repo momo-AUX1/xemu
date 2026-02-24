@@ -71,6 +71,7 @@ class MainActivity : SDLActivity(), InputManager.InputDeviceListener {
   private fun hideSystemUI() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       // Android 11 (API 30) and above
+      @Suppress("DEPRECATION")
       window.setDecorFitsSystemWindows(false)
       window.insetsController?.let { controller ->
         controller.hide(WindowInsets.Type.systemBars())
